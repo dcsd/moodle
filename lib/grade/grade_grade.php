@@ -747,7 +747,9 @@ class grade_grade extends grade_object {
     public function insert($source=null) {
         // TODO: dategraded hack - do not update times, they are used for submission and grading (MDL-31379)
         //$this->timecreated = $this->timemodified = time();
-        return parent::insert($source);
+        $id = parent::insert($source);
+        events_trigger('grade_update', array('grade' => $this));
+        return $id;
     }
 
     /**
@@ -762,7 +764,9 @@ class grade_grade extends grade_object {
         $this->finalgrade  = grade_floatval($this->finalgrade);
         $this->rawgrademin = grade_floatval($this->rawgrademin);
         $this->rawgrademax = grade_floatval($this->rawgrademax);
-        return parent::update($source);
+        $id = parent::update($source);
+        events_trigger('grade_update', array('grade' => $this));
+        return $id;
     }
 
     /**

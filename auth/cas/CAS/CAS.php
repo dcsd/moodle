@@ -191,6 +191,14 @@ define("PHPCAS_PROXIED_SERVICE_HTTP_GET", 'CAS_ProxiedService_Http_Get');
  */
 define("PHPCAS_PROXIED_SERVICE_HTTP_POST", 'CAS_ProxiedService_Http_Post');
 /**
+ * phpCAS::getProxiedService() type for HTTP PUT
+ */
+define("PHPCAS_PROXIED_SERVICE_HTTP_PUT", 'CAS_ProxiedService_Http_Put');
+/**
+ * phpCAS::getProxiedService() type for HTTP DELETE
+ */
+define("PHPCAS_PROXIED_SERVICE_HTTP_DELETE", 'CAS_ProxiedService_Http_Delete');
+/**
  * phpCAS::getProxiedService() type for IMAP
  */
 define("PHPCAS_PROXIED_SERVICE_IMAP", 'CAS_ProxiedService_Imap');
@@ -295,6 +303,10 @@ class phpCAS
      * @addtogroup publicInit
      * @{
      */
+
+    public static function is_initialized() {
+      return is_object(self::$_PHPCAS_CLIENT);
+    }
 
     /**
      * phpCAS client initializer.

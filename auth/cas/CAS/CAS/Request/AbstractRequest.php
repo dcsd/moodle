@@ -45,6 +45,8 @@ implements CAS_Request_RequestInterface
     protected $cookies = array();
     protected $headers = array();
     protected $isPost = false;
+    protected $isPut = false;
+    protected $isDelete = false;
     protected $postBody = null;
     protected $caCertPath = null;
     protected $validateCN = true;
@@ -181,6 +183,77 @@ implements CAS_Request_RequestInterface
     }
 
     /**
+     * Make the request a PUT request rather than the default GET request.
+     *
+     * @return void
+     * @throws CAS_OutOfSequenceException If called after the Request has been sent.
+     */
+    public function makePut ()
+    {
+        if ($this->_sent) {
+            throw new CAS_OutOfSequenceException('Request has already been sent cannot '.__METHOD__);
+        }
+
+        $this->isPut = true;
+    }
+
+    /**
+     * Add a PUT body to the request
+     *
+     * @param string $body body to add
+     *
+     * @return void
+     * @throws CAS_OutOfSequenceException If called after the Request has been sent.
+     */
+    public function setPutBody ($body)
+    {
+        if ($this->_sent) {
+            throw new CAS_OutOfSequenceException('Request has already been sent cannot '.__METHOD__);
+        }
+        if (!$this->isPut) {
+            throw new CAS_OutOfSequenceException('Cannot add a PUT body to a GET request, use makePost() first.');
+        }
+
+        $this->postBody = $body;
+    }
+
+    /**
+     * Make the request a DELETE request rather than the default GET request.
+     *
+     * @return void
+     * @throws CAS_OutOfSequenceException If called after the Request has been sent.
+     */
+    public function makeDelete ()
+    {
+        if ($this->_sent) {
+            throw new CAS_OutOfSequenceException('Request has already been sent cannot '.__METHOD__);
+        }
+
+        $this->isDelete = true;
+    }
+
+    /**
+     * Add a DELETE body to the request
+     *
+     * @param string $body body to add
+     *
+     * @return void
+     * @throws CAS_OutOfSequenceException If called after the Request has been sent.
+     */
+    public function setDeleteBody ($body)
+    {
+        if ($this->_sent) {
+            throw new CAS_OutOfSequenceException('Request has already been sent cannot '.__METHOD__);
+        }
+        if (!$this->isDelete) {
+            throw new CAS_OutOfSequenceException('Cannot add a DELETE body to a GET request, use makePost() first.');
+        }
+
+        $this->postBody = $body;
+    }
+
+
+    /**
      * Specify the path to an SSL CA certificate to validate the server with.
      *
      * @param string $caCertPath  path to cert
@@ -305,11 +378,21 @@ implements CAS_Request_RequestInterface
             throw new CAS_OutOfSequenceException('Request has not been sent yet. Cannot '.__METHOD__);
         }
 
-        if (!preg_match('/HTTP\/[0-9.]+\s+([0-9]+)\s*(.*)/', $this->_responseHeaders[0], $matches)) {
-            throw new CAS_Request_Exception("Bad response, no status code was found in the first line.");
+        // Because we can have more than 1 HTTP status header we loop through them
+        // all and return the last status.  You can have more than one for instance
+        // when a 100 is returned.
+        $response = null;
+        foreach($this->_responseHeaders as $header) {
+            if (preg_match('/HTTP\/[0-9.]+\s+([0-9]+)\s*(.*)/', $header, $matches)) {
+                $response = intval($matches[1]);
+            }
         }
 
-        return intval($matches[1]);
+        if(!isset($response)) {
+            throw new CAS_Request_Exception("Bad response, no status code was found.");
+        }
+
+        return $response;
     }
 
     /**

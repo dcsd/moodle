@@ -163,6 +163,21 @@ implements CAS_Request_RequestInterface
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postBody);
         }
+        /*********************************************************
+         * Flag and Body for PUT requests
+        *********************************************************/
+        elseif ($this->isPut) {
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postBody);
+        }
+        /*********************************************************
+         * Flag and Body for DELETE requests
+        *********************************************************/
+        elseif ($this->isDelete) {
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postBody);
+        }
 
         return $ch;
     }

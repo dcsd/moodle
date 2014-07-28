@@ -2503,6 +2503,8 @@ class CAS_Client
         switch ($type) {
         case PHPCAS_PROXIED_SERVICE_HTTP_GET:
         case PHPCAS_PROXIED_SERVICE_HTTP_POST:
+        case PHPCAS_PROXIED_SERVICE_HTTP_PUT:
+        case PHPCAS_PROXIED_SERVICE_HTTP_DELETE:
             $requestClass = $this->_requestImplementation;
             $request = new $requestClass();
             if (count($this->_curl_options)) {
